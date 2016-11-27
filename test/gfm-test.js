@@ -169,7 +169,8 @@ test('tables', function () {
         '    </tr>',
         '  </tbody',
         '</table>'].join('\n'),
-      ['| --- | --- |',
+      ['|  |  |',
+       '| --- | --- |',
        '| Row 1, Column 1 | Row 1, Column 2 |'
       ].join('\n'),
       'no header'
