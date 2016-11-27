@@ -233,7 +233,7 @@ toMarkdown.outer = outer
 
 module.exports = toMarkdown
 
-},{"./lib/gfm-converters":2,"./lib/html-parser":3,"./lib/md-converters":4,"collapse-whitespace":7}],2:[function(require,module,exports){
+},{"./lib/gfm-converters":2,"./lib/html-parser":3,"./lib/md-converters":4,"collapse-whitespace":5}],2:[function(require,module,exports){
 'use strict'
 
 function cell (content, node) {
@@ -277,33 +277,69 @@ module.exports = [
 
   {
     filter: 'tr',
-    replacement: function (content, node) {
-      var borderCells = ''
-      var alignMap = { left: ':--', right: '--:', center: ':-:' }
-
-      if (node.parentNode.nodeName === 'THEAD') {
-        for (var i = 0; i < node.childNodes.length; i++) {
-          var align = node.childNodes[i].attributes.align
-          var border = '---'
-
-          if (align) border = alignMap[align.value] || border
-
-          borderCells += cell(border, node.childNodes[i])
-        }
-      }
-      return '\n' + content + (borderCells ? '\n' + borderCells : '')
+    replacement: function (content) {
+      return '\n' + content
     }
   },
 
   {
     filter: 'table',
-    replacement: function (content) {
-      return '\n\n' + content + '\n\n'
+    replacement: function (content, node) {
+      // check if any of the children contain a THEAD
+      let containsThead = false
+      for (let childNode of node.childNodes) {
+        if (childNode.nodeName === 'THEAD') {
+          containsThead = true
+        }
+      }
+
+      if (containsThead) {
+        // if there is a THEAD then the THEAD knows how to render itself
+        return '\n\n' + content + '\n\n'
+      } else {
+        // if there is no THEAD an empty THEAD row has to be added
+        let emptyHead = ''
+        const firstChildNode = node.childNodes[0]
+        const maybeTBody = firstChildNode.childNodes[0]
+        if (maybeTBody) {
+          for (let i = 0; i < maybeTBody.childNodes.length; i++) {
+            emptyHead += cell('---', maybeTBody.childNodes[i])
+          }
+        }
+        return '\n\n' + emptyHead + content + '\n\n'
+      }
     }
   },
 
   {
-    filter: ['thead', 'tbody', 'tfoot'],
+    filter: 'thead',
+    replacement: function (content, node) {
+      let result = ''
+      const alignMap = { left: ':--', right: '--:', center: ':-:' }
+      const firstChildNode = node.childNodes[0]
+      if (firstChildNode) {
+        for (let i = 0; i < firstChildNode.childNodes.length; i++) {
+          var align = firstChildNode.childNodes[i].attributes.align
+          var border = '---'
+
+          if (align) border = alignMap[align.value] || border
+
+          result += cell(border, firstChildNode.childNodes[i])
+        }
+      }
+      return content + '\n' + result
+    }
+  },
+
+  {
+    filter: 'tbody',
+    replacement: function (content) {
+      return content
+    }
+  },
+
+  {
+    filter: 'tfoot',
     replacement: function (content) {
       return content
     }
@@ -423,7 +459,7 @@ function shouldUseActiveX () {
 
 module.exports = canParseHtmlNatively() ? _window.DOMParser : createHtmlParser()
 
-},{"jsdom":6}],4:[function(require,module,exports){
+},{"jsdom":8}],4:[function(require,module,exports){
 'use strict'
 
 module.exports = [
@@ -577,52 +613,6 @@ module.exports = [
 ]
 
 },{}],5:[function(require,module,exports){
-/**
- * This file automatically generated from `build.js`.
- * Do not manually edit.
- */
-
-module.exports = [
-  "address",
-  "article",
-  "aside",
-  "audio",
-  "blockquote",
-  "canvas",
-  "dd",
-  "div",
-  "dl",
-  "fieldset",
-  "figcaption",
-  "figure",
-  "footer",
-  "form",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "header",
-  "hgroup",
-  "hr",
-  "main",
-  "nav",
-  "noscript",
-  "ol",
-  "output",
-  "p",
-  "pre",
-  "section",
-  "table",
-  "tfoot",
-  "ul",
-  "video"
-];
-
-},{}],6:[function(require,module,exports){
-
-},{}],7:[function(require,module,exports){
 'use strict';
 
 var voidElements = require('void-elements');
@@ -760,7 +750,51 @@ function next(prev, current) {
 
 module.exports = collapseWhitespace;
 
-},{"block-elements":5,"void-elements":8}],8:[function(require,module,exports){
+},{"block-elements":6,"void-elements":7}],6:[function(require,module,exports){
+/**
+ * This file automatically generated from `build.js`.
+ * Do not manually edit.
+ */
+
+module.exports = [
+  "address",
+  "article",
+  "aside",
+  "audio",
+  "blockquote",
+  "canvas",
+  "dd",
+  "div",
+  "dl",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "footer",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "hgroup",
+  "hr",
+  "main",
+  "nav",
+  "noscript",
+  "ol",
+  "output",
+  "p",
+  "pre",
+  "section",
+  "table",
+  "tfoot",
+  "ul",
+  "video"
+];
+
+},{}],7:[function(require,module,exports){
 /**
  * This file automatically generated from `pre-publish.js`.
  * Do not manually edit.
@@ -784,6 +818,8 @@ module.exports = {
   "track": true,
   "wbr": true
 };
+
+},{}],8:[function(require,module,exports){
 
 },{}]},{},[1])(1)
 });
