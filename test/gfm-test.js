@@ -164,7 +164,6 @@ test('tables', function () {
       ['<table>',
         '  <tbody>',
         '    <tr>',
-        '      <td></td>',
         '      <td>Row 1, Column 1</td>',
         '      <td>Row 1, Column 2</td>',
         '    </tr>',
