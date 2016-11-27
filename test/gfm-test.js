@@ -159,6 +159,21 @@ test('tables', function () {
         '|  |  |  | Row 5, Column 4 |'
       ].join('\n'),
       'Empty cells'
+    ],
+    [
+      ['<table>',
+        '  <tbody>',
+        '    <tr>',
+        '      <td></td>',
+        '      <td>Row 1, Column 1</td>',
+        '      <td>Row 1, Column 2</td>',
+        '    </tr>',
+        '  </tbody',
+        '</table>'].join('\n'),
+      ['| --- | --- |',
+       '| Row 1, Column 1 | Row 1, Column 2 |'
+      ].join('\n'),
+      'no header'
     ]
   ])
 })
